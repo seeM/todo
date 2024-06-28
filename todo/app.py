@@ -29,12 +29,20 @@ def page(body: str, title: str):
 """
 
 
-async def homepage(request: Request):
-    return HTMLResponse(page("Hello world 4!", "My Page"))
+async def home(request: Request):
+    todos = [
+        "render a list of todos",
+        "add a todo",
+        "delete a todo",
+    ]
+    # TODO: Gotta escape these
+    rendered_todos = "\n".join(f"<li>{todo}</li>" for todo in todos)
+    body = f"<ul>{rendered_todos}</ul>"
+    return HTMLResponse(page(body, "My Page"))
 
 
 routes = [
-    Route("/", homepage),
+    Route("/", home),
 ]
 
 if DEBUG:
