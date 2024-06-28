@@ -3,5 +3,5 @@
 Start the app:
 
 ```sh
-uvicorn todo.app:app
+uvicorn --reload todo.app:app
 ```

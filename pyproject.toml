@@ -9,3 +9,9 @@ dependencies = [
     "starlette",
     "uvicorn",
 ]
+
+[project.optional-dependencies]
+dev = [
+    # Needed for websockets used by live reload.
+    "uvicorn[standard]",
+]
