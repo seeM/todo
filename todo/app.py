@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import os
 
 from starlette.applications import Starlette
@@ -34,9 +35,9 @@ async def home(request: Request):
         "render a list of todos",
         "add a todo",
         "delete a todo",
+        "</li><script>console.log('Im in!')</script>",
     ]
-    # TODO: Gotta escape these
-    rendered_todos = "\n".join(f"<li>{todo}</li>" for todo in todos)
+    rendered_todos = "\n".join(f"<li>{html.escape(todo)}</li>" for todo in todos)
     body = f"<ul>{rendered_todos}</ul>"
     return HTMLResponse(page(body, "My Page"))
 
