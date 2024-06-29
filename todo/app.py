@@ -42,13 +42,21 @@ def render_todo(todo):
 """
 
 
+def render_input(hx_swap_oob=False):
+    # TODO: This is where a nicer interface to creating html elements would help.
+    content = '<input id="todo-input" type="text" name="description"'
+    if hx_swap_oob:
+        content += ' hx-swap-oob="true"'
+    return content + ">"
+
+
 def render_home():
     rendered_todos = "\n".join(render_todo(todo) for todo in db["todos"].rows)
     return f"""
-<div hx-target="this" hx-swap="outerHTML">
+<div>
     {rendered_todos}
-    <form hx-post="/">
-        <input type="text" name="description" autofocus>
+    <form hx-target="this" hx-swap="beforebegin" hx-post="/">
+        {render_input()}
     </form>
 </div>
 """
@@ -60,8 +68,10 @@ async def home(request: Request):
 
 async def add_todo(request: Request):
     async with request.form() as form:
-        db["todos"].insert({"description": form["description"]})
-    return HTMLResponse(render_home())
+        todo = {"description": form["description"]}
+    db["todos"].insert(todo)
+    content = render_todo(todo) + render_input(hx_swap_oob=True)
+    return HTMLResponse(content)
 
 
 routes = [
