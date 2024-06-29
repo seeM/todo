@@ -6,6 +6,7 @@ build-backend = "hatchling.build"
 name = "todo"
 version = "0.0.0"
 dependencies = [
+    "python-multipart",
     "starlette",
     "uvicorn",
 ]
