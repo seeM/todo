@@ -39,6 +39,7 @@ def render_todo(todo):
     return f"""
 <div>
     {html.escape(todo["description"])}
+    <button hx-delete="/todos/{todo["id"]}" hx-target="closest div">delete</a>
 </div>
 """
 
@@ -53,7 +54,7 @@ def render_home():
     return f"""
 <div>
     {rendered_todos}
-    <form hx-target="this" hx-swap="beforebegin" hx-post="/">
+    <form hx-target="this" hx-swap="beforebegin" hx-post="/todos">
         {render_input()}
     </form>
 </div>
@@ -67,14 +68,20 @@ async def home(request: Request):
 async def add_todo(request: Request):
     async with request.form() as form:
         todo = {"description": form["description"]}
-    db["todos"].insert(todo)
+    todo["id"] = db["todos"].insert(todo).last_pk
     content = render_todo(todo) + render_input(hx_swap_oob=True)
     return HTMLResponse(content)
 
 
+async def delete_todo(request: Request):
+    db["todos"].delete(request.path_params["id"])
+    return HTMLResponse()
+
+
 routes = [
     Route("/", home, methods=["get"]),
-    Route("/", add_todo, methods=["post"]),
+    Route("/todos", add_todo, methods=["post"]),
+    Route("/todos/{id:int}", delete_todo, methods=["delete"]),
 ]
 
 if DEBUG:
