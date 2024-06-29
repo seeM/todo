@@ -16,7 +16,7 @@ DEBUG = os.getenv("DEBUG")
 db = Database("todo.db")
 
 
-def page(body: str, title: str):
+def render_page(body: str, title: str):
     # TODO: It would be great if there was a single place to add features like live reload.
     #       Suspect that would need a custom application class.
     if DEBUG:
@@ -28,6 +28,7 @@ def page(body: str, title: str):
         <script src="https://unpkg.com/htmx.org"></script>
     </head>
     <body>
+        <h1>Todos</h1>
         {body}
     </body>
 </html>
@@ -43,11 +44,8 @@ def render_todo(todo):
 
 
 def render_input(hx_swap_oob=False):
-    # TODO: This is where a nicer interface to creating html elements would help.
-    content = '<input id="todo-input" type="text" name="description"'
-    if hx_swap_oob:
-        content += ' hx-swap-oob="true"'
-    return content + ">"
+    hx_swap_oob_attr = "hx-swap-oob=true" if hx_swap_oob else ""
+    return f'<input id="todo-input" type="text" name="description" {hx_swap_oob_attr}>'
 
 
 def render_home():
@@ -63,7 +61,7 @@ def render_home():
 
 
 async def home(request: Request):
-    return HTMLResponse(page(render_home(), "Todos"))
+    return HTMLResponse(render_page(render_home(), "Todos"))
 
 
 async def add_todo(request: Request):
