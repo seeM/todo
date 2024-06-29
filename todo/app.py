@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import os
 
+from sqlite_utils import Database
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import HTMLResponse
@@ -12,12 +13,7 @@ from .live_reload import LIVE_RELOAD_ROUTE, LIVE_RELOAD_SCRIPT
 
 DEBUG = os.getenv("DEBUG")
 
-todos = [
-    "render a list of todos",
-    "add a todo",
-    "delete a todo",
-    "<script>console.log('Im in!')</script>",
-]
+db = Database("todo.db")
 
 
 def page(body: str, title: str):
@@ -38,21 +34,21 @@ def page(body: str, title: str):
 """
 
 
-def render_todo(todo: str):
+def render_todo(todo):
     return f"""
 <div>
-    {html.escape(todo)}
+    {html.escape(todo["description"])}
 </div>
 """
 
 
 def render_home():
-    rendered_todos = "\n".join(render_todo(todo) for todo in todos)
+    rendered_todos = "\n".join(render_todo(todo) for todo in db["todos"].rows)
     return f"""
 <div hx-target="this" hx-swap="outerHTML">
     {rendered_todos}
     <form hx-post="/">
-        <input type="text" name="todo" autofocus>
+        <input type="text" name="description" autofocus>
     </form>
 </div>
 """
@@ -64,8 +60,7 @@ async def home(request: Request):
 
 async def add_todo(request: Request):
     async with request.form() as form:
-        todo = form["todo"]
-        todos.append(todo)
+        db["todos"].insert({"description": form["description"]})
     return HTMLResponse(render_home())
 
 
