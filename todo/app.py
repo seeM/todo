@@ -5,7 +5,7 @@ import os
 
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.responses import HTMLResponse
 from starlette.routing import Route
 
 from .live_reload import LIVE_RELOAD_ROUTE, LIVE_RELOAD_SCRIPT
@@ -29,6 +29,7 @@ def page(body: str, title: str):
 <html>
     <head>
         <title>{title}</title>
+        <script src="https://unpkg.com/htmx.org"></script>
     </head>
     <body>
         {body}
@@ -37,22 +38,35 @@ def page(body: str, title: str):
 """
 
 
-async def home(request: Request):
-    rendered_todos = "\n".join(f"<div>{html.escape(todo)}</div>" for todo in todos)
-    form = """
-<form action="/" method="post">
-    <input type="text" name="todo">
-</form>
+def render_todo(todo: str):
+    return f"""
+<div>
+    {html.escape(todo)}
+</div>
 """
-    body = rendered_todos + form
-    return HTMLResponse(page(body, "My Page"))
+
+
+def render_home():
+    rendered_todos = "\n".join(render_todo(todo) for todo in todos)
+    return f"""
+<div hx-target="this" hx-swap="outerHTML">
+    {rendered_todos}
+    <form hx-post="/">
+        <input type="text" name="todo" autofocus>
+    </form>
+</div>
+"""
+
+
+async def home(request: Request):
+    return HTMLResponse(page(render_home(), "Todos"))
 
 
 async def add_todo(request: Request):
     async with request.form() as form:
         todo = form["todo"]
         todos.append(todo)
-    return RedirectResponse("/", status_code=302)
+    return HTMLResponse(render_home())
 
 
 routes = [
