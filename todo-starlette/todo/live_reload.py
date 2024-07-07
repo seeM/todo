@@ -8,11 +8,11 @@ from starlette.websockets import WebSocket
 
 LIVE_RELOAD_SCRIPT = """
 <script>
+    console.log('opening a new socket');
     var socket = new WebSocket(`ws://${window.location.host}/live-reload`);
     socket.onclose = function(event) {
-        if (event.wasClean) {
-            window.location.reload();
-        }
+        console.log('socket closed, event:', event);
+        window.location.reload();
     }
 </script>
 """

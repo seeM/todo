@@ -13,7 +13,7 @@ from .live_reload import LIVE_RELOAD_ROUTE, LIVE_RELOAD_SCRIPT
 
 DEBUG = os.getenv("DEBUG")
 
-db = Database("todo.db")
+db = Database("todo.sqlite")
 
 
 def render_page(body: str, title: str):
