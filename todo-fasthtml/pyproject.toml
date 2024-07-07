@@ -1,0 +1,14 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "todo"
+version = "0.0.0"
+dependencies = [
+    "python-fasthtml"
+]
+
+[project.optional-dependencies]
+dev = [
+]
