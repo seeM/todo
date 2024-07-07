@@ -44,9 +44,8 @@ def render_todo(todo):
 """
 
 
-def render_input(hx_swap_oob=False):
-    hx_swap_oob_attr = "hx-swap-oob=true" if hx_swap_oob else ""
-    return f'<input id="todo-input" type="text" name="description" {hx_swap_oob_attr}>'
+def render_input(hx_swap_oob=""):
+    return f'<input id="todo-input" type="text" name="description" hx-swap-oob-attr="{hx_swap_oob}">'
 
 
 def render_home():
@@ -69,7 +68,7 @@ async def add_todo(request: Request):
     async with request.form() as form:
         todo = {"description": form["description"]}
     todo["id"] = db["todos"].insert(todo).last_pk
-    content = render_todo(todo) + render_input(hx_swap_oob=True)
+    content = render_todo(todo) + render_input(hx_swap_oob="true")
     return HTMLResponse(content)
 
 

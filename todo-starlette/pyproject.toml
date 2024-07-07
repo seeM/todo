@@ -17,3 +17,6 @@ dev = [
     # Needed for websockets used by live reload.
     "uvicorn[standard]",
 ]
+
+[tool.ruff]
+line-length = 120
